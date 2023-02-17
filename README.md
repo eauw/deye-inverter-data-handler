@@ -1,6 +1,6 @@
 # README
 This is a simple services that fetches data from your inverter of type deye 600 sun
-and provides it to you MQTT broker.
+and provides it to your MQTT broker.
 
 ## Build
 (install Docker first)
@@ -21,6 +21,7 @@ MQTT_IP=[IP/hostname of your MQTT broker]
 If you want to use another port change the first 3000 to your preference.
 
 ## Values provided by inverter
+```
 webdata_sn
 webdata_msvn
 webdata_ssvn
@@ -44,3 +45,4 @@ cover_sta_mac
 status_a
 status_b
 status_c
+```
