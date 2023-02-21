@@ -6,6 +6,26 @@ const app = express();
 const mqtt = require('mqtt');
 const axios = require('axios');
 
+if (!process.env.MQTT_IP) {
+    console.log("MQTT_IP is missing.");
+    return;
+}
+
+if (!process.env.INVERTER_ADMIN) {
+    console.log("INVERTER_ADMIN is missing.");
+    return;
+}
+
+if (!process.env.INVERTER_PASSWORD) {
+    console.log("INVERTER_PASSWORD is missing.");
+    return;
+}
+
+if (!process.env.INVERTER_HOST) {
+    console.log("INVERTER_HOST is missing.");
+    return;
+}
+
 const mqttBroker = 'mqtt://' + process.env.MQTT_IP;
 console.log(`mqttBroker ${mqttBroker}`);
 const prefix = "deye600/";
@@ -14,6 +34,8 @@ const inverterAdmin = process.env.INVERTER_ADMIN;
 const inverterPassword = process.env.INVERTER_PASSWORD;
 const inverterIP = process.env.INVERTER_HOST;
 const inverterUrl = `http://${inverterIP}/status.html`;
+
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -65,6 +87,9 @@ const fetchData = () => {
                     case "EHOSTUNREACH":
                         reject(error.code);
                         break;
+                    case "ECONNREFUSED":
+                        reject(error.code);
+                        break;
                     default:
                         reject(error);
                         break;
@@ -75,14 +100,19 @@ const fetchData = () => {
 
 setInterval(function () {
     fetchData().then((data) => {
-        client.publish(prefix + 'power', data.power);
-        client.publish(prefix + 'yieldToday', data.yieldToday);
-        client.publish(prefix + 'yieldTotal', data.yieldTotal);
-        client.publish(prefix + 'alerts', data.alerts);
+        publish(data.power, data.yieldToday, data.yieldTotal, data.alerts);
     }).catch((error) => {
         console.log(error);
+        publish("", "", "", "");
     });
 }, 2000);
+
+const publish = (power, yieldToday, yieldTotal, alerts) => {
+    client.publish(prefix + 'power', power);
+    client.publish(prefix + 'yieldToday', yieldToday);
+    client.publish(prefix + 'yieldTotal', yieldTotal);
+    client.publish(prefix + 'alerts', alerts);
+}
 
 const parseData = (string) => {
     const power = getPower(string);
