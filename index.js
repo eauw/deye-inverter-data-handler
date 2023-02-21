@@ -55,11 +55,15 @@ const fetchData = () => {
                 resolve(data);
             })
             .catch(function (error) {
-                console.log(error.code);
-                if (error.code == "EHOSTDOWN") {
-                    reject(error.code);
-                } else {
-                    reject(error);
+                switch (error.code) {
+                    case "ENOTFOUND":
+                        reject(error.code);
+                        break;
+                    case "EHOSTDOWN":
+                        reject(error.code);
+                    default:
+                        reject(error);
+                        break;
                 }
             });
     });
