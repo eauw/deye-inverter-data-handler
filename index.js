@@ -61,6 +61,10 @@ const fetchData = () => {
                         break;
                     case "EHOSTDOWN":
                         reject(error.code);
+                        break;
+                    case "EHOSTUNREACH":
+                        reject(error.code);
+                        break;
                     default:
                         reject(error);
                         break;
