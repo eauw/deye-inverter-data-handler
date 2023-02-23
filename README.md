@@ -17,8 +17,9 @@ INVERTER_HOST=[IP/hostname of your inverter]
 MQTT_IP=[IP/hostname of your MQTT broker]
 ```
 
-3. `docker run -p 3000:3000 -d --env-file .env deye600`
+3. `docker run -p 3000:3000 -d --restart unless-stopped --env-file .env deye600`
 If you want to use another port change the first 3000 to your preference.
+Because of `--restart unless-stopped` the container will automatically restart.
 
 ## Values provided by inverter
 ```
