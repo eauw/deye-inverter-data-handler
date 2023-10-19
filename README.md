@@ -1,8 +1,10 @@
 # README
+
 This is a simple services that fetches data from your inverter of type deye 600 sun
 and provides it to your MQTT broker.
 
 ## Build
+
 (install Docker first)
 
 1. `npm install`
@@ -10,6 +12,7 @@ and provides it to your MQTT broker.
 2. `docker build -t deye600 .`
 
 3. Add a file `.env` and set the following variables:
+
 ```
 INVERTER_ADMIN=[username of your inverter]
 INVERTER_PASSWORD=[password of your inverter]
@@ -17,11 +20,12 @@ INVERTER_HOST=[IP/hostname of your inverter]
 MQTT_IP=[IP/hostname of your MQTT broker]
 ```
 
-3. `docker run -p 3000:3000 -d --restart unless-stopped --env-file .env deye600`
-If you want to use another port change the first 3000 to your preference.
-Because of `--restart unless-stopped` the container will automatically restart.
+3. `docker run -d --name deye-handler -p 3000:3000 --restart unless-stopped --env-file .env deye600`
+   If you want to use another port change the first 3000 to your preference.
+   Because of `--restart unless-stopped` the container will automatically restart.
 
 ## Values provided by inverter
+
 ```
 webdata_sn
 webdata_msvn
