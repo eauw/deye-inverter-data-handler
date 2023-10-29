@@ -27,6 +27,11 @@ if (!process.env.INVERTER_HOST) {
   return;
 }
 
+let INTERVAL_MS = 3000;
+if (!process.env.INTERVAL_MS) {
+  console.log("INTERVAL_MS is not set. Default is 3000.");
+}
+
 const mqttBroker = "mqtt://" + process.env.MQTT_IP;
 console.log(`mqttBroker ${mqttBroker}`);
 const prefix = "deye600/";
@@ -71,6 +76,7 @@ const fetchData = () => {
       })
       .then(function (response) {
         const data = parseData(response.data);
+        console.log("---");
         console.log(`power: ${data.power} W`);
         console.log(`yieldToday: ${data.yieldToday} kW`);
         console.log(`yieldTotal: ${data.yieldTotal} kW`);
@@ -95,8 +101,17 @@ const fetchData = () => {
           case "ECONNRESET":
             reject(error.code);
             break;
+          case "ERR_BAD_REQUEST":
+            console.log("Error ERR_BAD_REQUEST: Please check the credentials.");
+            console.log(error);
+            reject(error.code);
+            break;
+          case "ERR_BAD_RESPONSE":
+            reject(error.code);
+            break;
           default:
-            reject(error);
+            console.log(error);
+            reject(error.code);
             break;
         }
       });
@@ -106,20 +121,21 @@ const fetchData = () => {
 setInterval(function () {
   fetchData()
     .then((data) => {
-      publish(data.power, data.yieldToday, data.yieldTotal, data.alerts);
+      publish(data.power, data.yieldToday, data.yieldTotal, data.alerts, "");
     })
     .catch((error) => {
-      console.log("error in fetchData()");
+      console.log("error fetching data");
       console.log(error);
-      publish(prefix + "error", error);
+      publish("", "", "", "", error);
     });
-}, 2000);
+}, INTERVAL_MS);
 
-const publish = (power, yieldToday, yieldTotal, alerts) => {
+const publish = (power, yieldToday, yieldTotal, alerts, error) => {
   client.publish(prefix + "power", power);
   client.publish(prefix + "yieldToday", yieldToday);
   client.publish(prefix + "yieldTotal", yieldTotal);
   client.publish(prefix + "alerts", alerts);
+  client.publish(prefix + "error", error);
 };
 
 const parseData = (string) => {
