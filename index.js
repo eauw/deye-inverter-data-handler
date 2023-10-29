@@ -92,6 +92,9 @@ const fetchData = () => {
           case "ECONNREFUSED":
             reject(error.code);
             break;
+          case "ECONNRESET":
+            reject(error.code);
+            break;
           default:
             reject(error);
             break;
@@ -108,7 +111,7 @@ setInterval(function () {
     .catch((error) => {
       console.log("error in fetchData()");
       console.log(error);
-      publish("", "", "", "");
+      publish(prefix + "error", error);
     });
 }, 2000);
 
